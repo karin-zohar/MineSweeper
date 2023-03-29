@@ -46,7 +46,7 @@ h1 {
     text-align: center;
 }
 
-.floor:hover {
+.cell:hover {
     background-color: aliceblue;
     cursor:pointer;
 }

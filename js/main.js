@@ -4,9 +4,11 @@ console.log('hello!')
 const EMPTY = '?'
 const MINE = '💣'
 const MARKED = '🚩'
+const LIFE = '💖'
 var gBoard
 var gDisplayBoard
 var gGame
+//default level: beginner
 var gLevel = {
     size: 4,
     mines: 2
@@ -14,9 +16,7 @@ var gLevel = {
 
 
 function onInit() {
-    console.log('onInit good')
     resetGame()
-    // default level - beginner
     gBoard = buildBoard()
     gDisplayBoard = buildDisplayBoard()
     renderBoard(gDisplayBoard, '.board-container')
@@ -29,11 +29,11 @@ function resetGame() {
         isOn: false,
         showCount: 0,
         markedCount: 0,
-        secsPassed: 0
+        secsPassed: 0,
+        lives: 3
     }
 }
 
-// function updateScore()
 
 function buildBoard() {
     const size = gLevel.size
@@ -103,7 +103,7 @@ function startTimer() {
             clearInterval(timerInterval)
         }
         gGame.secsPassed = currTime
-    })
+    },100)
 }
 
 function onLevelBtn(levelBtn) {
@@ -111,7 +111,7 @@ function onLevelBtn(levelBtn) {
     var mines
     console.log('level btn clicked')
     const level = levelBtn.dataset.level
-    // if (levelBtn === 'beginner') level = 'beginner'
+
     switch (level) {
         case 'beginner':
             size = 4
@@ -134,31 +134,33 @@ function onLevelBtn(levelBtn) {
     onInit()
 }
 
-function onCellClicked(cell) {
-    // console.log('cell clicked!')
-    var cellLocation = { i: cell.dataset.i, j: cell.dataset.j }
+function onCellClicked(elCell) {
+    // console.log('elCell: ', elCell)
+    var cellLocation = { i: elCell.dataset.i, j: elCell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
     if (!gGame.isOn) fillBoard(cellLocation)
     if (cellData.isMarked) {
         return
     }
-
+    
+    if (cellData.isMine) {
+        if (cellData.isShown) return
+        updateLives()
+        // checkGameOver()
+    }
     cellData.isShown = true
-    if (cellData.minesAroundCount === 0) {
+    if (cellData.minesAroundCount === 0 && !cellData.isMine) {
         const cellNegs = getNeighbors(cellLocation.i, cellLocation.j, gBoard) //returns array of neighbors
         expandShown(cellNegs)
     }
-
+    
     gDisplayBoard = buildDisplayBoard()
     renderBoard(gDisplayBoard, '.board-container')
-    if (cellData.isMine) {
-        gameOver(false)
-        return
-    }
+    checkGameOver(false)
 }
 
 function expandShown(cellNegs) {
-    for (var i =0; i < cellNegs.length; i++) {
+    for (var i = 0; i < cellNegs.length; i++) {
         cellNegs[i].isShown = true
     }
 }
@@ -195,7 +197,7 @@ function setMinesNegsCount(board) {
 function onMarkCell(cell) {
     var cellLocation = { i: cell.dataset.i, j: cell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
-    if (!gGame.isOn) fillBoard(cellLocation)
+    if (!gGame.isOn && !cellData.isMarked) fillBoard(cellLocation)
     if (cellData.isShown) {
         return
     }
@@ -203,29 +205,57 @@ function onMarkCell(cell) {
     // console.log('cellData: ', cellData)
     gDisplayBoard = buildDisplayBoard()
     renderCell(cellLocation, gDisplayBoard[cellLocation.i][cellLocation.j])
-    checkGameOver()
+    checkGameOver(true)
 }
 
 function fillBoard(cellLocation) {
     gGame.isOn = true
     startTimer()
     addMines(cellLocation)
-    // gBoard[0][3].isMine = true
-    // console.log('added mines')
     setMinesNegsCount(gBoard)
-    // console.log('added MinesNegsCount')
 }
 
-function checkGameOver() {
-    for (var i =0; i < gGame.mineLocations.length; i++) {
-        const mineLocation = gGame.mineLocations[i]
-        // console.log('mineLocation: ', mineLocation)
-        const mineCell = gBoard[mineLocation.i][mineLocation.j]
-        // console.log('mineCell: ', mineCell)
-        if (!mineCell.isMarked) return false
+function checkGameOver(isMarked) {
+    if (isMarked) { 
+        for (var i = 0; i < gGame.mineLocations.length; i++) {
+            const mineLocation = gGame.mineLocations[i]
+            const mineCell = gBoard[mineLocation.i][mineLocation.j]
+            if (mineCell.isShown) {
+                continue
+            } else if (!mineCell.isMarked) {
+                return
+            }
+        } 
+         // user marked all the mines - win
+        console.log('case 2')
+        gameOver(true)
+    } else {
+        //user ran out of lives - lose
+        if (gGame.lives === 0) {
+            console.log('case 1')
+            gameOver(false)
+            return
+        }
+        
+        // user revealed the entire board, lives > 0  - win
+        for (var i = 0; i < gBoard.length; i++) {
+            for (var j = 0; j < gBoard.length; j++) {
+                const cell = gBoard[i][j]
+                if (!cell.isShown) {
+                    if (cell.isMarked) {
+                        continue
+                    }
+                    return
+                }
+            }
+        }
+        console.log('case 3')
+        gameOver(true)
     }
-    gameOver(true)
-}
+        
+    }
+
+
 
 function gameOver(isVictory) {
     if (isVictory) {
@@ -234,4 +264,16 @@ function gameOver(isVictory) {
     } else {
         console.log('You lose')
     }
+}
+
+
+function updateLives() {
+    gGame.lives--
+    const elLives = document.querySelector('.lives')
+    // console.log('elLives: ', elLives)
+    var lives = LIFE.repeat(gGame.lives)
+    // console.log('lives: ', lives)
+    var strHTML = `LIVES: ${lives}`
+    // console.log('strHTML: ', strHTML)
+    elLives.innerHTML = strHTML
 }
