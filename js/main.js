@@ -5,6 +5,11 @@ const EMPTY = '?'
 const MINE = '💣'
 const MARKED = '🚩'
 const LIFE = '💖'
+const SMILEY = {
+    normal: '😊',
+    lose: '👻',
+    win: '😎'
+}
 var gBoard
 var gDisplayBoard
 var gGame
@@ -20,6 +25,8 @@ function onInit() {
     gBoard = buildBoard()
     gDisplayBoard = buildDisplayBoard()
     renderBoard(gDisplayBoard, '.board-container')
+    handleSmiley()
+    handleElements()
 }
 
 
@@ -30,7 +37,8 @@ function resetGame() {
         showCount: 0,
         markedCount: 0,
         secsPassed: 0,
-        lives: 3
+        lives: 3,
+        isVictory: false
     }
 }
 
@@ -109,19 +117,24 @@ function startTimer() {
 function onLevelBtn(levelBtn) {
     var size
     var mines
-    console.log('level btn clicked')
+    // console.log('level btn clicked')
     const level = levelBtn.dataset.level
+    const elBoardContainer = document.querySelector('.board-container')
+    console.log('elBoardContainer: ', elBoardContainer)
 
     switch (level) {
         case 'beginner':
+            elBoardContainer.classList.add('beginner')
             size = 4
             mines = 2
             break;
         case 'medium':
+            elBoardContainer.classList.add('medium')
             size = 8
             mines = 14
             break;
         case 'expert':
+            elBoardContainer.classList.add('expert')
             size = 12
             mines = 32
             break;
@@ -138,7 +151,7 @@ function onCellClicked(elCell) {
     // console.log('elCell: ', elCell)
     var cellLocation = { i: elCell.dataset.i, j: elCell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
-    if (!gGame.isOn) fillBoard(cellLocation)
+    if (!gGame.isOn) startGame(cellLocation)
     if (cellData.isMarked) {
         return
     }
@@ -197,7 +210,7 @@ function setMinesNegsCount(board) {
 function onMarkCell(cell) {
     var cellLocation = { i: cell.dataset.i, j: cell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
-    if (!gGame.isOn && !cellData.isMarked) fillBoard(cellLocation)
+    if (!gGame.isOn && !cellData.isMarked) startGame(cellLocation)
     if (cellData.isShown) {
         return
     }
@@ -208,8 +221,9 @@ function onMarkCell(cell) {
     checkGameOver(true)
 }
 
-function fillBoard(cellLocation) {
+function startGame(cellLocation) {
     gGame.isOn = true
+    handleElements() 
     startTimer()
     addMines(cellLocation)
     setMinesNegsCount(gBoard)
@@ -258,10 +272,15 @@ function checkGameOver(isMarked) {
 
 
 function gameOver(isVictory) {
+    gGame.isOn = false
+    gGame.isVictory = isVictory
+    handleModal()
+    handleSmiley()
+    handleElements()
     if (isVictory) {
-        gGame.isOn = false
         console.log('You won!')
     } else {
+        
         console.log('You lose')
     }
 }
@@ -276,4 +295,41 @@ function updateLives() {
     var strHTML = `LIVES: ${lives}`
     // console.log('strHTML: ', strHTML)
     elLives.innerHTML = strHTML
+}
+
+function handleSmiley() {
+    var elSmiley = document.querySelector('.smiley')
+    console.log('elSmiley: ', elSmiley)
+    if (gGame.isOn) {
+        elSmiley.innerHTML = SMILEY.normal
+    } else if  (gGame.isVictory) {
+        elSmiley.innerHTML = SMILEY.win
+    } else {
+        elSmiley.innerHTML = SMILEY.lose
+    }
+}
+
+function handleModal() {
+    const elModal = document.querySelector('.modal')
+    console.log('elModal: ', elModal) 
+    var msg = (gGame.isVictory) ? 'You Win! 🏆' : 'Sorry, you blew up 💀'
+    elModal.innerHTML = msg
+
+}
+
+function handleElements() {
+    const elTopInfoContainer = document.querySelector('.top-info-container')
+    const elLevelBtnsContainer = document.querySelector('.level-btns-container')
+    const elModalContainer = document.querySelector('.modal-container')
+    console.log('elModalContainer: ', elModalContainer)
+    handleSmiley()
+    // console.log('elLevelBtnsContainer: ', elLevelBtnsContainer)
+    if (gGame.isOn) {
+        // console.log('elTopInfoContainer: ', elTopInfoContainer)
+        elTopInfoContainer.classList.remove('hide')
+        elLevelBtnsContainer.classList.add('hide')
+        elModalContainer.classList.add('hide')
+    } else {
+        elModalContainer.classList.remove('hide')
+    }
 }
