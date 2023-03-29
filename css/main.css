@@ -1,0 +1,59 @@
+body {
+    background-color: lightsteelblue;
+}
+
+h1 {
+    color: aliceblue;
+    text-align: center;
+}
+
+
+.start-game-container {
+    /* border: 3px solid yellow; */
+    width:120px;
+    align-items: center;
+}
+.btn {
+    margin: auto;
+    border: 3px solid hsl(240, 33%, 34%);
+    background-color: hsl(240, 33%, 34%);
+    color: aliceblue;
+    border-radius: 10%;
+    width: 110px;
+    height: 50px;
+    padding: 15px;
+    box-sizing: border-box;
+    text-align: center;
+    font-style: oblique;
+    cursor: pointer;
+}
+
+.btn:hover {
+    width: 130px;
+    transition: 0.5s;
+}
+
+.board-container {
+    margin:auto;
+    /* border: 3px solid yellow; */
+    width: 450px;
+}
+
+.cell {
+    background-color: whitesmoke;
+    height: 35px;
+    width: 35px;
+    text-align: center;
+}
+
+.floor:hover {
+    background-color: aliceblue;
+    cursor:pointer;
+}
+.wall {
+    background-color: hsl(240, 33%, 34%);
+}
+
+.hide {
+    display:none;
+}
