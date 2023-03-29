@@ -12,6 +12,14 @@
     <div class="start-game-container">
         <div class="btn start-game hide" onClick="onStartGame()">Start Game</div>
     </div>
+    <div class="level-btns-container">
+        <div data-level="beginner" class="btn level-btn" onClick="onLevelBtn(this)">Beginner</div>
+        <div data-level="medium" class="btn level-btn" onClick="onLevelBtn(this)">Medium</div>
+        <div data-level="expert" class="btn level-btn" onClick="onLevelBtn(this)">Expert</div>
+    </div>
+    <div class="timer-container hide">
+        <div class="timer">timer</div>
+    </div>
     <div class="board-container" oncontextmenu="return false;"></div>
     <script src="js/util.js"></script>
     <script src="js/main.js"></script>

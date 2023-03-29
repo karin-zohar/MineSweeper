@@ -37,6 +37,19 @@ function countNeighbors(cellI, cellJ, mat, gameElement, checkValue) {
     return neighborsCount
 }
 
+function getNeighbors(cellI, cellJ, mat) {
+    const neighbors = []
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (i === cellI && j === cellJ) continue
+            if (j < 0 || j >= mat[i].length) continue
+            neighbors.push(mat[i][j])
+        }
+    }
+    return neighbors
+}
+
 //drawNum 
 function drawNum(nums) {
     var randIdx = getRandomInt(0, nums.length)
@@ -94,7 +107,7 @@ function renderBoard(mat, selector) {
             const cell = mat[i][j]
             const className = `cell cell-${i}-${j}`
 
-            strHTML += `<td data-i="${i}" data-j="${j}" class="${className}" onClick="onCell(this)" oncontextmenu="onMarkCell(this)">${cell}</td>`
+            strHTML += `<td data-i="${i}" data-j="${j}" class="${className}" onClick="onCellClicked(this)" oncontextmenu="onMarkCell(this)">${cell}</td>`
         }
         strHTML += '</tr>'
     }

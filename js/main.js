@@ -1,20 +1,22 @@
 'use strict'
 console.log('hello!')
 
-const WALL = '-'
-const EMPTY = 'e'
+const EMPTY = '?'
 const MINE = '💣'
 const MARKED = '🚩'
 var gBoard
 var gDisplayBoard
 var gGame
-var gLevel
+var gLevel = {
+    size: 4,
+    mines: 2
+}
 
 
 function onInit() {
     console.log('onInit good')
     resetGame()
-    gLevel = onLevelBtn()
+    // default level - beginner
     gBoard = buildBoard()
     gDisplayBoard = buildDisplayBoard()
     renderBoard(gDisplayBoard, '.board-container')
@@ -97,22 +99,42 @@ function startTimer() {
         const diff = Date.now() - startTime
         var currTime = (diff / 1000).toFixed(2)
         elTimer.innerText = currTime
-        if (gLatestNum === (gNumOfRows ** 2)) {
+        if (!gGame.isOn) {
             clearInterval(timerInterval)
         }
         gGame.secsPassed = currTime
     })
 }
 
-function onLevelBtn() {
-    gLevel = {
-        size: 4,
-        mines: 2
+function onLevelBtn(levelBtn) {
+    var size
+    var mines
+    console.log('level btn clicked')
+    const level = levelBtn.dataset.level
+    // if (levelBtn === 'beginner') level = 'beginner'
+    switch (level) {
+        case 'beginner':
+            size = 4
+            mines = 2
+            break;
+        case 'medium':
+            size = 8
+            mines = 14
+            break;
+        case 'expert':
+            size = 12
+            mines = 32
+            break;
     }
-    return gLevel
+
+    gLevel = {
+        size: size,
+        mines: mines
+    }
+    onInit()
 }
 
-function onCell(cell) {
+function onCellClicked(cell) {
     // console.log('cell clicked!')
     var cellLocation = { i: cell.dataset.i, j: cell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
@@ -120,14 +142,25 @@ function onCell(cell) {
     if (cellData.isMarked) {
         return
     }
+
     cellData.isShown = true
-    // console.log('cellData: ', cellData)
+    if (cellData.minesAroundCount === 0) {
+        const cellNegs = getNeighbors(cellLocation.i, cellLocation.j, gBoard) //returns array of neighbors
+        expandShown(cellNegs)
+    }
+
     gDisplayBoard = buildDisplayBoard()
-    // console.log('gDisplayBoard: ', gDisplayBoard)
-    renderCell(cellLocation, gDisplayBoard[cellLocation.i][cellLocation.j])
+    renderBoard(gDisplayBoard, '.board-container')
+    if (cellData.isMine) {
+        gameOver(false)
+        return
+    }
+}
 
-
-
+function expandShown(cellNegs) {
+    for (var i =0; i < cellNegs.length; i++) {
+        cellNegs[i].isShown = true
+    }
 }
 
 function addMines(firstCellLocation) {
@@ -196,6 +229,7 @@ function checkGameOver() {
 
 function gameOver(isVictory) {
     if (isVictory) {
+        gGame.isOn = false
         console.log('You won!')
     } else {
         console.log('You lose')
