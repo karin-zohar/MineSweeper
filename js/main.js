@@ -46,7 +46,8 @@ function resetGame() {
         isVictory: false,
         isHintMode: false,
         safeClicksLeft: 3,
-        isManualMode: false
+        isManualMode: false,
+        isNightMode: false
     }
 }
 
@@ -159,7 +160,13 @@ function onCellClicked(elCell) {
     if (cellData.isMarked || cellData.isShown) {
         return
     }
+
+    if (gGame.isManualMode) {
+        ManuallyAddMine(elCell, cellData)
+        return
+    }
     if (!gGame.isOn) startGame(cellLocation)
+
     gGame.showCount++
 
     if (cellData.isMine && !gGame.isHintMode) {
@@ -211,6 +218,9 @@ function expandShown(cellNegs) {
 }
 
 function addMines(firstCellLocation) {
+    if (gGame.isManualMode) {
+        return
+    }
     gGame.mineLocations = []
     for (var i = 0; i < gLevel.mines; i++) {
         var minePosition = (getRandomPos(gBoard))
@@ -261,12 +271,12 @@ function onMarkCell(cell) {
 }
 
 function startGame(cellLocation) {
-    gGame.isOn = true
-    gGame.isStarted = true
-    handleElements()
-    startTimer()
-    addMines(cellLocation)
-    setMinesNegsCount(gBoard)
+        gGame.isOn = true
+        gGame.isStarted = true
+        handleElements()
+        startTimer()
+        addMines(cellLocation)
+        setMinesNegsCount(gBoard)
 }
 
 function checkGameOver(isMarked) {
@@ -292,6 +302,7 @@ function checkGameOver(isMarked) {
         }
         // user revealed the entire board, lives > 0  - win
         if (gGame.showCount + gGame.markedCount === gLevel.size ** 2) {
+            console.log('gGame.showCount: ', gGame.showCount)
             console.log('case 3')
             gameOver(true)
 
@@ -358,6 +369,7 @@ function handleElements() {
     const elLevelBtnsContainer = document.querySelector('.level-btns-container')
     const elModalContainer = document.querySelector('.modal-container')
     const elTimerContainer = document.querySelector('.timer-container')
+    const elManualModeBtn = document.querySelector('.manual-mode-btn')
 
     handleSmiley()
 
@@ -366,6 +378,7 @@ function handleElements() {
         elTopInfoContainer.classList.remove('hide')
         elTimerContainer.classList.remove('hide')
         elTopInfoContainerTwo.classList.remove('hide')
+        elManualModeBtn.classList.add('hide')
     } else if (gGame.showCount === 0 && gGame.markedCount === 0) {
         elLevelBtnsContainer.classList.remove('hide')
         elModalContainer.classList.add('hide')
@@ -480,4 +493,52 @@ function onSafeClick() {
     }
     const onSafeClickBtn = document.querySelector('.safe-click-btn')
     onSafeClickBtn.innerHTML = gGame.safeClicksLeft
+}
+
+function onManualModeBtn(elManualModeBtn) {
+    console.log('manual mode btn clicked')
+    elManualModeBtn.classList.toggle('manual-mode-on')
+    gGame.isManualMode = !gGame.isManualMode
+    const elCells = document.querySelectorAll('.cell')
+    for (var i = 0; i < elCells.length; i++) {
+        const elCell = elCells[i]
+        elCell.classList.add('manual-mode')
+    }
+    if (gGame.isManualMode) {
+        const elManualModeDoneBtn = document.querySelector('.manual-mode-done-btn')
+        elManualModeDoneBtn.classList.remove('hide')
+    }
+}
+
+function onManualModeDoneBtn(elManualModeDoneBtn) {
+    gGame.isManualMode = !gGame.isManualMode
+
+    elManualModeDoneBtn.classList.add('hide')
+    const elCells = document.querySelectorAll('.cell')
+    for (var i = 0; i < elCells.length; i++) {
+        const elCell = elCells[i]
+        elCell.classList.remove('manual-mode')
+        elCell.classList.remove('manual-mode-cell-clicked')
+    }
+
+    const elManualModeBtn = document.querySelector('.manual-mode-btn')
+    elManualModeBtn.classList.add('hide')
+}
+
+function ManuallyAddMine(elCell,cellData) {
+    console.log('elCell: ', elCell)
+    console.log('cellData: ', cellData)
+    elCell.classList.add('manual-mode-cell-clicked')
+    cellData.isMine = true
+}
+
+function onNightMode(elNightModeBtn) {
+    console.log('elNightModeBtn: ', elNightModeBtn)
+    gGame.isNightMode = !gGame.isNightMode
+    const elBody = document.querySelector('body')
+    console.log('elBody: ', elBody)
+    elBody.classList.toggle('night-mode-theme')
+    var nightModeIcon = (gGame.isNightMode) ? '🌞' : '🌜'
+    elNightModeBtn.innerHTML = nightModeIcon
+
 }

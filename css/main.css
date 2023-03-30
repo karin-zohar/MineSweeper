@@ -1,14 +1,35 @@
+:root {
+    --background: lightsteelblue;
+    --free-text-color: hsl(240, 33%, 34%);
+    --btn-color: hsl(240, 33%, 34%);
+    --btn-text-color: aliceblue;
+    --top-btn-color: aliceblue;
+    --cell-color: whitesmoke;
+
+}
+
 body {
-    background-color: lightsteelblue;
+    background-color: var(--background);
+}
+
+
+
+.night-mode-theme {
+    --background: rgb(41, 46, 53);
+    --free-text-color: hsl(240, 35%, 81%);
+    --btn-color: hsl(240, 17%, 50%);
+    --btn-text-color: rgb(45, 61, 75);
+    --top-btn-color: rgb(124, 156, 184);
+    --cell-color: rgb(171, 134, 206);
 }
 
 h1 {
-    color: aliceblue;
+    color: var(--free-text-color);
     text-align: center;
 }
 
 h3 {
-    color: hsl(240, 33%, 34%);
+    color: var(--free-text-color);
     text-align: center;
 }
 
@@ -28,9 +49,9 @@ table {
     display: inline-block;
     margin: auto;
     gap: 30%;
-    border: 3px solid hsl(240, 33%, 34%);
-    background-color: hsl(240, 33%, 34%);
-    color: aliceblue;
+    border: 3px solid var(--btn-color);
+    background-color: var(--btn-color);
+    color: var(--btn-text-color);
     border-radius: 10%;
     width: 110px;
     height: 50px;
@@ -68,7 +89,7 @@ table {
 }
 
 .cell {
-    background-color: whitesmoke;
+    background-color: var(--cell-color);
     height: 50px;
     width: 50px;
     text-align: center;
@@ -80,7 +101,7 @@ table {
 }
 
 .cell.active:hover {
-    background-color: aliceblue;
+    background-color: var(--btn-text-color);
     cursor: pointer;
 }
 
@@ -93,8 +114,8 @@ table {
 
 .modal {
     border: 4px solid aliceblue;
-    background-color: hsl(240, 33%, 34%);
-    color: aliceblue;
+    background-color: var(--btn-color);
+    color: var(--btn-text-color);
     text-align: center;
     padding: 30px;
     box-sizing: border-box;
@@ -116,9 +137,9 @@ table {
 .timer {
     display: inline-block;
     margin: auto;
-    border: 3px solid hsl(240, 33%, 34%);
-    background-color: hsl(240, 33%, 34%);
-    color: aliceblue;
+    border: 3px solid var(--btn-color);
+    background-color: var(--btn-color);
+    color: var(--btn-text-color);
     border-radius: 10%;
     width: 110px;
     height: 50px;
@@ -132,7 +153,7 @@ table {
 .top-info-container {
     margin: auto;
     /* border: 3px solid red; */
-    width: 260px;
+    width: 270px;
     align-items: center;
     gap: 10px;
 }
@@ -143,7 +164,7 @@ table {
     /* background-color: aliceblue; */
     /* border: 3px solid aliceblue; */
     border-radius: 10%;
-    background-color: aliceblue;
+    background-color: var(--top-btn-color);
     height: 50px;
     box-sizing: border-box;
 }
@@ -177,7 +198,7 @@ table {
 .hint {
     display: inline-block;
     margin: auto;
-    background-color: aliceblue;
+    background-color: var(--top-btn-color);
     padding: 10px;
     border-radius: 50%;
     cursor: pointer;
@@ -211,14 +232,14 @@ table {
 p {
     padding: 10px;
     margin: auto;
-    color: hsl(240, 33%, 34%);
+    color: var(--free-text-color);
 }
 
 .safe-click-btn {
 
-    border: 2px solid hsl(240, 33%, 34%);
-    color:hsl(240, 33%, 34%);
-    background-color: aliceblue;
+    border: 2px solid var(--btn-color);
+    color:var(--free-text-color);
+    background-color: var(--top-btn-color);
     border-radius: 10%;
     margin: auto;
     width: 70px;
@@ -246,7 +267,7 @@ p {
 }
 .leaderboard-container {
     margin: auto;
-    border: 2px solid whitesmoke;
+    border: 2px solid var(--cell-color);
     width: 200px;
     padding-bottom: 10px;
 
@@ -254,7 +275,7 @@ p {
 
 .leaderboard-cell {
     /* background-color: whitesmoke; */
-    color: hsl(240, 33%, 34%);
+    color: var(--free-text-color);
     height: 20px;
     width: 25px;
     padding: 5px;
@@ -263,7 +284,7 @@ p {
 }
 
 .leaderboard-cell.heading {
-    background-color: lightsteelblue;
+    background-color: var(--background);
 }
 
 .footer {
@@ -285,4 +306,28 @@ p {
 
 .space {
     height: 10px;
+}
+
+.manual-mode-container {
+    /* border: 3px solid yellow; */
+    width: 250px;
+    margin: auto;
+    padding: 10px;
+}
+.manual-mode-btn {
+    width: 130px;
+}
+
+.manual-mode-on {
+    border: 3px solid azure;
+}
+.manual-mode {
+    border: 2px solid lightslategray;
+}
+.manual-mode:hover {
+    border: 2px solid lightsalmon;
+}
+
+.manual-mode-cell-clicked {
+    border: 2px solid lightsalmon;
 }

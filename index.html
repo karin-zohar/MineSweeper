@@ -15,6 +15,11 @@
         <div data-level="medium" class="btn level-btn" onClick="onLevelBtn(this)">Medium</div>
         <div data-level="expert" class="btn level-btn" onClick="onLevelBtn(this)">Expert</div>
     </div>
+
+    <div class="manual-mode-container">
+        <div class="btn manual-mode-btn" onclick="onManualModeBtn(this)">Manual Mode</div>
+        <div class="btn manual-mode-done-btn hide" onclick="onManualModeDoneBtn(this)"> Done</div>
+    </div>
     <div class="timer-container hide">
         <div class="timer">timer</div>
     </div>
@@ -22,7 +27,7 @@
     <div class="top-info-container hide">
         <div class="smiley top-info" onClick="onInit()">smiley</div>
         <div class="lives top-info">LIVES: 💖💖💖</div>
-        <div class="night-mode-btn top-info" onClick="onNightMode()">🌜</div>
+        <div class="night-mode-btn top-info" onclick="onNightMode(this)">🌜</div>
     </div>
     <div class="top-info-container-two hide">
         <div class="safe-click">
