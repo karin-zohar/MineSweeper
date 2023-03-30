@@ -14,7 +14,7 @@ var gBoard
 var gDisplayBoard
 var gGame
 var gResults = []
-var gLeaderBoardLength = 2
+var gLeaderBoardLength = 5
 
 //default level: beginner
 var gLevel = {
@@ -123,10 +123,8 @@ function startTimer() {
 function onLevelBtn(levelBtn) {
     var size
     var mines
-    // console.log('level btn clicked')
     const level = levelBtn.dataset.level
     const elBoardContainer = document.querySelector('.board-container')
-    console.log('elBoardContainer: ', elBoardContainer)
 
     switch (level) {
         case 'beginner':
@@ -154,13 +152,12 @@ function onLevelBtn(levelBtn) {
 }
 
 function onCellClicked(elCell) {
-    // console.log('elCell: ', elCell)
     var cellLocation = { i: elCell.dataset.i, j: elCell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
-    if (!gGame.isOn) startGame(cellLocation)
     if (cellData.isMarked || cellData.isShown) {
         return
     }
+    if (!gGame.isOn) startGame(cellLocation)
     gGame.showCount++
     
     if (cellData.isMine) {
@@ -171,12 +168,12 @@ function onCellClicked(elCell) {
     cellData.isShown = true
     if (gGame.isHintMode) {
         cellData.isShown = true
-        console.log('gBoard: ', gBoard[3][0])
+        // console.log('gBoard: ', gBoard[3][0])
         gDisplayBoard = buildDisplayBoard()
         renderBoard(gDisplayBoard, '.board-container')
         setTimeout(() => {
             cellData.isShown = false
-            console.log('gBoard: ', gBoard[3][0])
+            // console.log('gBoard: ', gBoard[3][0])
             gGame.showCount--
             gDisplayBoard = buildDisplayBoard()
             renderBoard(gDisplayBoard, '.board-container')
@@ -184,24 +181,29 @@ function onCellClicked(elCell) {
     }
 
     if (cellData.minesAroundCount === 0 && !cellData.isMine) {
+        cellData.isShown = true
         const cellNegs = getNeighbors(cellLocation.i, cellLocation.j, gBoard) //returns array of neighbors
         expandShown(cellNegs)
     }
 
     gDisplayBoard = buildDisplayBoard()
-    // console.log('gBoard - right before render: ', gBoard[3][0])
     renderBoard(gDisplayBoard, '.board-container')
     checkGameOver(false)
-    // console.log('gGame: ', gGame)
 }
 
 
 
 function expandShown(cellNegs) {
     for (var i = 0; i < cellNegs.length; i++) {
-        if (!cellNegs[i].isMine && !cellNegs[i].isMarked && !cellNegs[i].isShown) {
-            cellNegs[i].isShown = true
-            gGame.showCount++
+        const cell = cellNegs[i]
+        if (cell.minesAroundCount === 0 && !cell.isMine) {
+            // console.log('cell: ', cell)
+            if (!cell.isMine && !cell.isMarked && !cell.isShown) {
+                cell.isShown = true
+                gGame.showCount++
+                var nextCellNegs = getNeighbors(cell.location.i,cell.location.j, gBoard)
+                expandShown(nextCellNegs)
+            }
         }
     }
 }
@@ -302,6 +304,7 @@ function gameOver(isVictory) {
     handleModal()
     handleSmiley()
     handleElements()
+    deactivateCells()
     if (isVictory) {
         console.log('You won!')
         storeLastScore()
@@ -419,7 +422,8 @@ function displayLeaderBoard() {
 
 
 function renderLeaderBoard(mat, selector) {
-    var strHTML = '<table border="0"><tbody>'
+    var strHTML = `<h3 class="leaderborad-title">leaderboard</h3>
+    <table border="0"><tbody>`
     strHTML += `<tr><td class="leaderboard-cell heading">Place</td><td class="leaderboard-cell heading">nickname</td><td class="leaderboard-cell heading">score</td></tr>`
     for (var i = 0; i < mat.length; i++) {
         console.log('entered outer for loop')
@@ -444,3 +448,10 @@ function renderLeaderBoard(mat, selector) {
     // console.log('elContainer: ', elContainer)
 }
 
+function deactivateCells() {
+    const elCells = document.querySelectorAll('.cell')
+    for (var i = 0; i < elCells.length; i++) {
+        const elCell = elCells[i]
+        elCell.classList.remove('active')
+    }
+}
