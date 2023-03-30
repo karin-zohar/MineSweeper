@@ -44,7 +44,9 @@ function resetGame() {
         secsPassed: 0,
         lives: 3,
         isVictory: false,
-        isHintMode: false
+        isHintMode: false,
+        safeClicksLeft: 3,
+        isManualMode: false
     }
 }
 
@@ -159,8 +161,8 @@ function onCellClicked(elCell) {
     }
     if (!gGame.isOn) startGame(cellLocation)
     gGame.showCount++
-    
-    if (cellData.isMine) {
+
+    if (cellData.isMine && !gGame.isHintMode) {
         if (cellData.isShown) return
         updateLives(1)
     }
@@ -201,7 +203,7 @@ function expandShown(cellNegs) {
             if (!cell.isMine && !cell.isMarked && !cell.isShown) {
                 cell.isShown = true
                 gGame.showCount++
-                var nextCellNegs = getNeighbors(cell.location.i,cell.location.j, gBoard)
+                var nextCellNegs = getNeighbors(cell.location.i, cell.location.j, gBoard)
                 expandShown(nextCellNegs)
             }
         }
@@ -314,6 +316,8 @@ function gameOver(isVictory) {
     console.log('gLeaderBoardLength: ', gLeaderBoardLength)
     if (gResults.length >= gLeaderBoardLength) {
         console.log('making leaderboard')
+        const elLeaderboardContainer = document.querySelector('.leaderboard-container')
+        elLeaderboardContainer.classList.remove(hide)
         displayLeaderBoard()
     }
 }
@@ -350,28 +354,33 @@ function handleModal() {
 
 function handleElements() {
     const elTopInfoContainer = document.querySelector('.top-info-container')
+    const elTopInfoContainerTwo = document.querySelector('.top-info-container-two')
     const elLevelBtnsContainer = document.querySelector('.level-btns-container')
     const elModalContainer = document.querySelector('.modal-container')
+    const elTimerContainer = document.querySelector('.timer-container')
+
     handleSmiley()
 
     if (gGame.isOn) {
         elLevelBtnsContainer.classList.add('hide')
         elTopInfoContainer.classList.remove('hide')
+        elTimerContainer.classList.remove('hide')
+        elTopInfoContainerTwo.classList.remove('hide')
     } else if (gGame.showCount === 0 && gGame.markedCount === 0) {
         elLevelBtnsContainer.classList.remove('hide')
         elModalContainer.classList.add('hide')
     }
     if (!gGame.isOn && gGame.showCount > 0) {
         elModalContainer.classList.remove('hide')
+        elTimerContainer.classList.add('hide')
     }
-    
+
 }
 
 function onHint(elHint) {
     gGame.isHintMode = true
     elHint.classList.add('hint-clicked')
     const elCells = document.querySelectorAll('.cell')
-    // console.log('elCells: ', elCells)
     for (var i = 0; i < elCells.length; i++) {
         const elCell = elCells[i]
         elCell.classList.add('hint-mode-cell')
@@ -408,16 +417,16 @@ function createLeaderBoard() {
 
 function displayLeaderBoard() {
     const leaderBoard = []
-    var leaders = gResults.slice(0,gLeaderBoardLength)
+    var leaders = gResults.slice(0, gLeaderBoardLength)
     // console.log('leaders: ', leaders)
     for (var i = 0; i < gLeaderBoardLength; i++) {
         leaderBoard.push([])
-        leaderBoard[i][0] = i+1
+        leaderBoard[i][0] = i + 1
         leaderBoard[i][1] = leaders[i].nickname
         leaderBoard[i][2] = leaders[i].score
     }
     // console.log('leaderBoard: ', leaderBoard)
-    renderLeaderBoard(leaderBoard,'.leaderboard-container')
+    renderLeaderBoard(leaderBoard, '.leaderboard-container')
 }
 
 
@@ -454,4 +463,21 @@ function deactivateCells() {
         const elCell = elCells[i]
         elCell.classList.remove('active')
     }
+}
+
+function onSafeClick() {
+    if (gGame.safeClicksLeft > 0) {
+        gGame.safeClicksLeft--
+        var safeCellPos = getEmptyPos()
+        while (gBoard[safeCellPos.i][safeCellPos.j].isShown) {
+            safeCellPos = getEmptyPos()
+        }
+        const elSafeCell = document.querySelector(`.cell-${safeCellPos.i}-${safeCellPos.j}`)
+        elSafeCell.classList.add('safe-cell')
+        setTimeout(() => {
+            elSafeCell.classList.remove('safe-cell')
+        }, 4000);
+    }
+    const onSafeClickBtn = document.querySelector('.safe-click-btn')
+    onSafeClickBtn.innerHTML = gGame.safeClicksLeft
 }

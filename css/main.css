@@ -13,7 +13,7 @@ h3 {
 }
 
 table {
-    margin:auto;
+    margin: auto;
 }
 
 .level-btns-container {
@@ -41,9 +41,6 @@ table {
     cursor: pointer;
 }
 
-/* .level-btn {
-    margin: auto;
-} */
 
 .btn:hover {
     width: 130px;
@@ -52,7 +49,7 @@ table {
 
 
 .board-container {
-    margin:auto;
+    margin: auto;
     /* border: 3px solid yellow; */
     width: 200px;
     z-index: 1;
@@ -84,11 +81,11 @@ table {
 
 .cell.active:hover {
     background-color: aliceblue;
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .modal-container {
-    margin:auto;
+    margin: auto;
     align-items: center;
     /* border: 3px solid yellow; */
     width: 220px;
@@ -97,9 +94,9 @@ table {
 .modal {
     border: 4px solid aliceblue;
     background-color: hsl(240, 33%, 34%);
-    color:aliceblue;
+    color: aliceblue;
     text-align: center;
-    padding:30px;
+    padding: 30px;
     box-sizing: border-box;
     border-radius: 10%;
     margin: auto;
@@ -109,20 +106,44 @@ table {
     z-index: 2;
 }
 
-.top-info-container {
-    margin:auto;
+.timer-container {
     /* border: 3px solid red; */
-    width: 500px;
-    align-items:center;
+    align-items: center;
+    margin: auto;
+    width: 110px;
+}
+
+.timer {
+    display: inline-block;
+    margin: auto;
+    border: 3px solid hsl(240, 33%, 34%);
+    background-color: hsl(240, 33%, 34%);
+    color: aliceblue;
+    border-radius: 10%;
+    width: 110px;
+    height: 50px;
+    padding: 15px;
+    box-sizing: border-box;
+    text-align: center;
+    font-style: oblique;
+    gap: 30%;
+}
+
+.top-info-container {
+    margin: auto;
+    /* border: 3px solid red; */
+    width: 260px;
+    align-items: center;
     gap: 10px;
 }
 
 .top-info {
     display: inline-block;
-    padding:15px;
+    padding: 15px;
     /* background-color: aliceblue; */
-    border: 3px solid aliceblue;
-    /* border-radius: 10%; */
+    /* border: 3px solid aliceblue; */
+    border-radius: 10%;
+    background-color: aliceblue;
     height: 50px;
     box-sizing: border-box;
 }
@@ -132,55 +153,108 @@ table {
     cursor: pointer;
 }
 
+.top-info-container-two {
+    margin: auto;
+    /* border: 3px solid yellow; */
+    align-items: center;
+    width: 300px;
+    height: 100px;
+}
+
 .night-mode-btn {
     cursor: pointer;
 }
 
 .hints-container {
-    margin:auto;
-    align-items: center;
-    border:none;
-    /* border: 3px solid yellow; */
+    position: absolute;
+    /* border: 3px solid red; */
+    display: inline-block;
+    height: 50px;
+    margin: 20px auto;
+
 }
 
 .hint {
     display: inline-block;
+    margin: auto;
     background-color: aliceblue;
     padding: 10px;
     border-radius: 50%;
     cursor: pointer;
 }
 
-.hint:hover{
-    padding:8px;
+.hint:hover {
+    background-color: azure;
+    padding: 8px;
     transition: 0.5s;
 }
 
 .hint-clicked {
-    box-shadow: 0 0 50px 15px #e0c257;
+    /* box-shadow: 0 0 50px 15px #e0c257; */
     transition: 0.5s;
 
 }
 
-.cell[ishint="true"] {
-    background-color: #e0c257;
+.safe-click {
+    display: inline-block;
+    padding: 10px;
+    margin: auto;
+    box-sizing: border-box;
+    /* border: 3px solid red; */
+    width: 120px;
+    height: 100px;
+    border-radius: 10%;
+    text-align: center;
+    align-items: center;
 }
+
+p {
+    padding: 10px;
+    margin: auto;
+    color: hsl(240, 33%, 34%);
+}
+
+.safe-click-btn {
+
+    border: 2px solid hsl(240, 33%, 34%);
+    color:hsl(240, 33%, 34%);
+    background-color: aliceblue;
+    border-radius: 10%;
+    margin: auto;
+    width: 70px;
+    height: 50px;
+    padding: 15px;
+    box-sizing: border-box;
+    text-align: center;
+
+}
+
+.safe-click-btn:hover {
+    background-color: azure;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
 
 .hint-mode-cell:hover {
     box-shadow: 0 0 10px 5px #e0c257;
 }
 
+
+.safe-cell {
+    border: 2px solid lightgreen;
+}
 .leaderboard-container {
     margin: auto;
     border: 2px solid whitesmoke;
     width: 200px;
-    padding-bottom:10px;
+    padding-bottom: 10px;
 
 }
 
 .leaderboard-cell {
     /* background-color: whitesmoke; */
-    color:  hsl(240, 33%, 34%);
+    color: hsl(240, 33%, 34%);
     height: 20px;
     width: 25px;
     padding: 5px;
@@ -195,20 +269,20 @@ table {
 .footer {
     width: 100px;
     margin: 100px auto;
-   
+
 }
 
 .slow-hide {
     opacity: 0;
     padding: 3px;
     transition: 1s;
-    cursor:default
+    cursor: default
 }
 
 .hide {
-    display:none;
+    display: none;
 }
 
-.space{ 
+.space {
     height: 10px;
 }

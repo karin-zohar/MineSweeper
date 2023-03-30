@@ -15,27 +15,34 @@
         <div data-level="medium" class="btn level-btn" onClick="onLevelBtn(this)">Medium</div>
         <div data-level="expert" class="btn level-btn" onClick="onLevelBtn(this)">Expert</div>
     </div>
+    <div class="timer-container hide">
+        <div class="timer">timer</div>
+    </div>
     <div class="space"></div>
     <div class="top-info-container hide">
-        <div class="timer top-info">timer</div>
         <div class="smiley top-info" onClick="onInit()">smiley</div>
         <div class="lives top-info">LIVES: 💖💖💖</div>
         <div class="night-mode-btn top-info" onClick="onNightMode()">🌜</div>
-        <div class="hints-container top-info">
+    </div>
+    <div class="top-info-container-two hide">
+        <div class="safe-click">
+            <div class="safe-click-btn" onClick="onSafeClick()">3</div>
+            <p>safe-clicks</p>
+        </div>
+        <div class="hints-container">
             <div class="hint" onclick="onHint(this)">💡</div>
             <div class="hint" onclick="onHint(this)">💡</div>
             <div class="hint" onclick="onHint(this)">💡</div>
         </div>
     </div>
-    <div class="space"></div>
-    <div class="modal-container hide">
-        <div class="modal">modal</div>
-    </div>
+        <div class="space"></div>
+        <div class="modal-container hide">
+            <div class="modal">modal</div>
+        </div>
     <div class="board-container" oncontextmenu="return false;"></div>
     <div class="space"></div>
     <div class="space"></div>
-    <!-- <h3 class="leaderborad-title">leaderboard</h3> -->
-    <div class="leaderboard-container"></div>
+    <div class="leaderboard-container hide"></div>
 
     <div class="footer">by Karin Zohar</div>
 
