@@ -25,6 +25,7 @@ function onInit() {
     gBoard = buildBoard()
     gDisplayBoard = buildDisplayBoard()
     renderBoard(gDisplayBoard, '.board-container')
+    updateLives(0)
     handleSmiley()
     handleElements()
 }
@@ -34,11 +35,13 @@ function onInit() {
 function resetGame() {
     gGame = {
         isOn: false,
+        isStarted: false,
         showCount: 0,
         markedCount: 0,
         secsPassed: 0,
         lives: 3,
-        isVictory: false
+        isVictory: false,
+        isHintMode: false
     }
 }
 
@@ -148,7 +151,8 @@ function onLevelBtn(levelBtn) {
 }
 
 function onCellClicked(elCell) {
-    // console.log('elCell: ', elCell)
+    gGame.showCount++
+    console.log('elCell: ', elCell)
     var cellLocation = { i: elCell.dataset.i, j: elCell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
     if (!gGame.isOn) startGame(cellLocation)
@@ -156,11 +160,12 @@ function onCellClicked(elCell) {
         return
     }
     
+    
     if (cellData.isMine) {
         if (cellData.isShown) return
-        updateLives()
-        // checkGameOver()
+        updateLives(1)
     }
+    
     cellData.isShown = true
     if (cellData.minesAroundCount === 0 && !cellData.isMine) {
         const cellNegs = getNeighbors(cellLocation.i, cellLocation.j, gBoard) //returns array of neighbors
@@ -170,11 +175,17 @@ function onCellClicked(elCell) {
     gDisplayBoard = buildDisplayBoard()
     renderBoard(gDisplayBoard, '.board-container')
     checkGameOver(false)
+    // console.log('gGame: ', gGame)
 }
+
+
 
 function expandShown(cellNegs) {
     for (var i = 0; i < cellNegs.length; i++) {
-        cellNegs[i].isShown = true
+        if (!cellNegs[i].isMine && !cellNegs[i].isMarked && !cellNegs[i].isShown) {
+            cellNegs[i].isShown = true
+            gGame.showCount++
+        }
     }
 }
 
@@ -214,7 +225,14 @@ function onMarkCell(cell) {
     if (cellData.isShown) {
         return
     }
-    cellData.isMarked = (cellData.isMarked) ? false : true
+    // cellData.isMarked = (cellData.isMarked) ? false : true
+    if (cellData.isMarked) {
+        cellData.isMarked = false
+        gGame.markedCount--
+    } else {
+        cellData.isMarked = true
+        gGame.markedCount++
+    }
     // console.log('cellData: ', cellData)
     gDisplayBoard = buildDisplayBoard()
     renderCell(cellLocation, gDisplayBoard[cellLocation.i][cellLocation.j])
@@ -223,6 +241,7 @@ function onMarkCell(cell) {
 
 function startGame(cellLocation) {
     gGame.isOn = true
+    gGame.isStarted = true
     handleElements() 
     startTimer()
     addMines(cellLocation)
@@ -250,26 +269,15 @@ function checkGameOver(isMarked) {
             gameOver(false)
             return
         }
-        
         // user revealed the entire board, lives > 0  - win
-        for (var i = 0; i < gBoard.length; i++) {
-            for (var j = 0; j < gBoard.length; j++) {
-                const cell = gBoard[i][j]
-                if (!cell.isShown) {
-                    if (cell.isMarked) {
-                        continue
-                    }
-                    return
-                }
-            }
+        if (gGame.showCount + gGame.markedCount === gLevel.size ** 2) {
+            console.log('case 3')
+            gameOver(true)
+
         }
-        console.log('case 3')
-        gameOver(true)
     }
         
     }
-
-
 
 function gameOver(isVictory) {
     gGame.isOn = false
@@ -286,8 +294,8 @@ function gameOver(isVictory) {
 }
 
 
-function updateLives() {
-    gGame.lives--
+function updateLives(diff) {
+    gGame.lives -= diff
     const elLives = document.querySelector('.lives')
     // console.log('elLives: ', elLives)
     var lives = LIFE.repeat(gGame.lives)
@@ -299,8 +307,8 @@ function updateLives() {
 
 function handleSmiley() {
     var elSmiley = document.querySelector('.smiley')
-    console.log('elSmiley: ', elSmiley)
-    if (gGame.isOn) {
+    // console.log('elSmiley: ', elSmiley)
+    if (gGame.isOn || !gGame.isStarted) {
         elSmiley.innerHTML = SMILEY.normal
     } else if  (gGame.isVictory) {
         elSmiley.innerHTML = SMILEY.win
@@ -311,7 +319,7 @@ function handleSmiley() {
 
 function handleModal() {
     const elModal = document.querySelector('.modal')
-    console.log('elModal: ', elModal) 
+    // console.log('elModal: ', elModal) 
     var msg = (gGame.isVictory) ? 'You Win! 🏆' : 'Sorry, you blew up 💀'
     elModal.innerHTML = msg
 
@@ -321,15 +329,33 @@ function handleElements() {
     const elTopInfoContainer = document.querySelector('.top-info-container')
     const elLevelBtnsContainer = document.querySelector('.level-btns-container')
     const elModalContainer = document.querySelector('.modal-container')
-    console.log('elModalContainer: ', elModalContainer)
+    // console.log('elModalContainer: ', elModalContainer)
     handleSmiley()
-    // console.log('elLevelBtnsContainer: ', elLevelBtnsContainer)
+    
+    // gGame.isOn: show board + top container, hide lvl btns
     if (gGame.isOn) {
-        // console.log('elTopInfoContainer: ', elTopInfoContainer)
-        elTopInfoContainer.classList.remove('hide')
         elLevelBtnsContainer.classList.add('hide')
+        elTopInfoContainer.classList.remove('hide')
+    } else if (gGame.showCount === 0 && gGame.markedCount === 0) {
+        elLevelBtnsContainer.classList.remove('hide')
         elModalContainer.classList.add('hide')
-    } else {
+    }
+    if (!gGame.isOn && gGame.showCount > 0) {
         elModalContainer.classList.remove('hide')
     }
+    // game over: show board + top container + modal
+    // 
+}
+
+function onHint(elHint) {
+    gGame.isHintMode = true
+    elHint.classList.add('hint-clicked')
+    setTimeout(() => {
+        gGame.isHintMode = false
+        elHint.classList.add('slow-hide')
+    }, 5000);
+    setTimeout(() => {
+        elHint.classList.add('hide')
+    }, 6000);
+
 }

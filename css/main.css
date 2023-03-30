@@ -72,6 +72,11 @@ table {
     text-align: center;
 }
 
+.hint-mode-cell-clicked {
+    background-color: #e0c257;
+    height: 200px;
+}
+
 .cell:hover {
     background-color: aliceblue;
     cursor:pointer;
@@ -101,8 +106,8 @@ table {
 
 .top-info-container {
     margin:auto;
-    /* border: 3px solid yellow; */
-    width: 360px;
+    /* border: 3px solid red; */
+    width: 500px;
     align-items:center;
     gap: 10px;
 }
@@ -117,12 +122,61 @@ table {
     box-sizing: border-box;
 }
 
+
+.smiley {
+    cursor: pointer;
+}
+
+.night-mode-btn {
+    cursor: pointer;
+}
+
+.hints-container {
+    margin:auto;
+    align-items: center;
+    border:none;
+    /* border: 3px solid yellow; */
+}
+
+.hint {
+    display: inline-block;
+    background-color: aliceblue;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.hint:hover{
+    padding:8px;
+    transition: 0.5s;
+}
+
+.hint-clicked {
+    box-shadow: 0 0 50px 15px #e0c257;
+    transition: 0.5s;
+
+}
+
+.cell[ishint="true"] {
+    background-color: #e0c257;
+}
+
+.hint-mode-cell:hover {
+    box-shadow: 0 0 50px 15px #e0c257;
+}
+
 .footer {
     width: 100px;
     margin: 100px auto;
    
 }
 
+.slow-hide {
+    opacity: 0;
+    padding: 3px;
+    transition: 1s;
+    cursor:default
+}
 
 .hide {
     display:none;
