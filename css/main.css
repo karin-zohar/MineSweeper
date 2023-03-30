@@ -162,7 +162,23 @@ table {
 }
 
 .hint-mode-cell:hover {
-    box-shadow: 0 0 50px 15px #e0c257;
+    box-shadow: 0 0 10px 5px #e0c257;
+}
+
+
+
+.leaderboard-cell {
+    /* background-color: whitesmoke; */
+    color:  hsl(240, 33%, 34%);
+    height: 20px;
+    width: 25px;
+    padding: 5px;
+    border-radius: 10%;
+    text-align: center;
+}
+
+.leaderboard-cell.heading {
+    background-color: lightsteelblue;
 }
 
 .footer {

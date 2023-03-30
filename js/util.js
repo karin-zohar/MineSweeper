@@ -99,6 +99,7 @@ function createMat(ROWS, COLS) {
 function renderBoard(mat, selector) {
 
     var strHTML = '<table border="0"><tbody>'
+    
     for (var i = 0; i < mat.length; i++) {
 
         strHTML += '<tr>'
@@ -116,3 +117,4 @@ function renderBoard(mat, selector) {
     const elContainer = document.querySelector(selector)
     elContainer.innerHTML = strHTML
 }
+

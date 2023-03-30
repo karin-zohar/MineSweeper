@@ -13,6 +13,9 @@ const SMILEY = {
 var gBoard
 var gDisplayBoard
 var gGame
+var gResults = []
+var gLeaderBoardLength = 2
+
 //default level: beginner
 var gLevel = {
     size: 4,
@@ -114,7 +117,7 @@ function startTimer() {
             clearInterval(timerInterval)
         }
         gGame.secsPassed = currTime
-    },100)
+    }, 100)
 }
 
 function onLevelBtn(levelBtn) {
@@ -151,28 +154,42 @@ function onLevelBtn(levelBtn) {
 }
 
 function onCellClicked(elCell) {
-    gGame.showCount++
-    console.log('elCell: ', elCell)
+    // console.log('elCell: ', elCell)
     var cellLocation = { i: elCell.dataset.i, j: elCell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
     if (!gGame.isOn) startGame(cellLocation)
-    if (cellData.isMarked) {
+    if (cellData.isMarked || cellData.isShown) {
         return
     }
-    
+    gGame.showCount++
     
     if (cellData.isMine) {
         if (cellData.isShown) return
         updateLives(1)
     }
-    
+
     cellData.isShown = true
+    if (gGame.isHintMode) {
+        cellData.isShown = true
+        console.log('gBoard: ', gBoard[3][0])
+        gDisplayBoard = buildDisplayBoard()
+        renderBoard(gDisplayBoard, '.board-container')
+        setTimeout(() => {
+            cellData.isShown = false
+            console.log('gBoard: ', gBoard[3][0])
+            gGame.showCount--
+            gDisplayBoard = buildDisplayBoard()
+            renderBoard(gDisplayBoard, '.board-container')
+        }, 5000);
+    }
+
     if (cellData.minesAroundCount === 0 && !cellData.isMine) {
         const cellNegs = getNeighbors(cellLocation.i, cellLocation.j, gBoard) //returns array of neighbors
         expandShown(cellNegs)
     }
-    
+
     gDisplayBoard = buildDisplayBoard()
+    // console.log('gBoard - right before render: ', gBoard[3][0])
     renderBoard(gDisplayBoard, '.board-container')
     checkGameOver(false)
     // console.log('gGame: ', gGame)
@@ -242,14 +259,14 @@ function onMarkCell(cell) {
 function startGame(cellLocation) {
     gGame.isOn = true
     gGame.isStarted = true
-    handleElements() 
+    handleElements()
     startTimer()
     addMines(cellLocation)
     setMinesNegsCount(gBoard)
 }
 
 function checkGameOver(isMarked) {
-    if (isMarked) { 
+    if (isMarked) {
         for (var i = 0; i < gGame.mineLocations.length; i++) {
             const mineLocation = gGame.mineLocations[i]
             const mineCell = gBoard[mineLocation.i][mineLocation.j]
@@ -258,8 +275,8 @@ function checkGameOver(isMarked) {
             } else if (!mineCell.isMarked) {
                 return
             }
-        } 
-         // user marked all the mines - win
+        }
+        // user marked all the mines - win
         console.log('case 2')
         gameOver(true)
     } else {
@@ -276,8 +293,8 @@ function checkGameOver(isMarked) {
 
         }
     }
-        
-    }
+
+}
 
 function gameOver(isVictory) {
     gGame.isOn = false
@@ -287,30 +304,33 @@ function gameOver(isVictory) {
     handleElements()
     if (isVictory) {
         console.log('You won!')
-    } else {
-        
-        console.log('You lose')
+        storeLastScore()
+        createLeaderBoard()
+    }
+    console.log('gResults.length: ', gResults.length)
+    console.log('gLeaderBoardLength: ', gLeaderBoardLength)
+    if (gResults.length >= gLeaderBoardLength) {
+        console.log('making leaderboard')
+        displayLeaderBoard()
     }
 }
+
+
 
 
 function updateLives(diff) {
     gGame.lives -= diff
     const elLives = document.querySelector('.lives')
-    // console.log('elLives: ', elLives)
     var lives = LIFE.repeat(gGame.lives)
-    // console.log('lives: ', lives)
     var strHTML = `LIVES: ${lives}`
-    // console.log('strHTML: ', strHTML)
     elLives.innerHTML = strHTML
 }
 
 function handleSmiley() {
     var elSmiley = document.querySelector('.smiley')
-    // console.log('elSmiley: ', elSmiley)
     if (gGame.isOn || !gGame.isStarted) {
         elSmiley.innerHTML = SMILEY.normal
-    } else if  (gGame.isVictory) {
+    } else if (gGame.isVictory) {
         elSmiley.innerHTML = SMILEY.win
     } else {
         elSmiley.innerHTML = SMILEY.lose
@@ -329,10 +349,8 @@ function handleElements() {
     const elTopInfoContainer = document.querySelector('.top-info-container')
     const elLevelBtnsContainer = document.querySelector('.level-btns-container')
     const elModalContainer = document.querySelector('.modal-container')
-    // console.log('elModalContainer: ', elModalContainer)
     handleSmiley()
-    
-    // gGame.isOn: show board + top container, hide lvl btns
+
     if (gGame.isOn) {
         elLevelBtnsContainer.classList.add('hide')
         elTopInfoContainer.classList.remove('hide')
@@ -343,19 +361,86 @@ function handleElements() {
     if (!gGame.isOn && gGame.showCount > 0) {
         elModalContainer.classList.remove('hide')
     }
-    // game over: show board + top container + modal
-    // 
+    
 }
 
 function onHint(elHint) {
     gGame.isHintMode = true
     elHint.classList.add('hint-clicked')
+    const elCells = document.querySelectorAll('.cell')
+    // console.log('elCells: ', elCells)
+    for (var i = 0; i < elCells.length; i++) {
+        const elCell = elCells[i]
+        elCell.classList.add('hint-mode-cell')
+    }
     setTimeout(() => {
         gGame.isHintMode = false
         elHint.classList.add('slow-hide')
+        for (var i = 0; i < elCells.length; i++) {
+            const elCell = elCells[i]
+            elCell.classList.remove('hint-mode-cell')
+        }
     }, 5000);
     setTimeout(() => {
         elHint.classList.add('hide')
     }, 6000);
 
 }
+
+function storeLastScore() {
+    var nickname = prompt('Enter Nickname:')
+    if (!nickname) nickname = 'anonymous'
+    if (typeof (Storage) !== "undefined") {
+        localStorage.setItem("nickname", nickname);
+        localStorage.setItem("score", gGame.secsPassed);
+
+    }
+}
+
+function createLeaderBoard() {
+    var lastResult = { nickname: localStorage.getItem("nickname"), score: localStorage.getItem("score") }
+    gResults.push(lastResult)
+    gResults.sort((a, b) => a.score - b.score)
+}
+
+function displayLeaderBoard() {
+    const leaderBoard = []
+    var leaders = gResults.slice(0,gLeaderBoardLength)
+    // console.log('leaders: ', leaders)
+    for (var i = 0; i < gLeaderBoardLength; i++) {
+        leaderBoard.push([])
+        leaderBoard[i][0] = i+1
+        leaderBoard[i][1] = leaders[i].nickname
+        leaderBoard[i][2] = leaders[i].score
+    }
+    // console.log('leaderBoard: ', leaderBoard)
+    renderLeaderBoard(leaderBoard,'.leaderboard-container')
+}
+
+
+function renderLeaderBoard(mat, selector) {
+    var strHTML = '<table border="0"><tbody>'
+    strHTML += `<tr><td class="leaderboard-cell heading">Place</td><td class="leaderboard-cell heading">nickname</td><td class="leaderboard-cell heading">score</td></tr>`
+    for (var i = 0; i < mat.length; i++) {
+        console.log('entered outer for loop')
+        console.log('mat[0]: ', mat[0])
+
+        strHTML += '<tr>'
+        for (var j = 0; j < mat[0].length; j++) {
+            console.log('entered inner for loop')
+            const cell = mat[i][j]
+            console.log('cell: ', cell)
+            const className = `leaderboard-cell cell-${i}-${j}`
+
+            strHTML += `<td class="${className}" =>${cell}</td>`
+        }
+        strHTML += '</tr>'
+    }
+    strHTML += '</tbody></table>'
+
+    // console.log('strHTML: ', strHTML)
+    const elContainer = document.querySelector(selector)
+    elContainer.innerHTML = strHTML
+    // console.log('elContainer: ', elContainer)
+}
+
