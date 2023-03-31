@@ -7,7 +7,8 @@
     <title>Minesweeper</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
-<body onload="onInit()">
+<body onload="onInit()" onclick="storeGameHistory(event)">
+    <div class="night-mode-btn" onclick="onNightMode(this)">🌜</div>
     <h1>Minesweeper</h1>
     
     <div class="level-btns-container">
@@ -19,6 +20,7 @@
     <div class="manual-mode-container">
         <div class="btn manual-mode-btn" onclick="onManualModeBtn(this)">Manual Mode</div>
         <div class="btn manual-mode-done-btn hide" onclick="onManualModeDoneBtn(this)"> Done</div>
+        
     </div>
     <div class="timer-container hide">
         <div class="timer">timer</div>
@@ -27,7 +29,8 @@
     <div class="top-info-container hide">
         <div class="smiley top-info" onClick="onInit()">smiley</div>
         <div class="lives top-info">LIVES: 💖💖💖</div>
-        <div class="night-mode-btn top-info" onclick="onNightMode(this)">🌜</div>
+        <div class="undo-btn top-info" onClick="onUndoBtn()">Undo</div>
+        <!-- <div class="night-mode-btn top-info" onclick="onNightMode(this)">🌜</div> -->
     </div>
     <div class="top-info-container-two hide">
         <div class="safe-click">

@@ -3,6 +3,7 @@
     --free-text-color: hsl(240, 33%, 34%);
     --btn-color: hsl(240, 33%, 34%);
     --btn-text-color: aliceblue;
+    --title-color: aliceblue;
     --top-btn-color: aliceblue;
     --cell-color: whitesmoke;
 
@@ -15,17 +16,21 @@ body {
 
 
 .night-mode-theme {
-    --background: rgb(41, 46, 53);
+    --background:  hsl(240, 35%, 21%);
     --free-text-color: hsl(240, 35%, 81%);
-    --btn-color: hsl(240, 17%, 50%);
-    --btn-text-color: rgb(45, 61, 75);
-    --top-btn-color: rgb(124, 156, 184);
-    --cell-color: rgb(171, 134, 206);
+    --btn-color: lightsteelblue;
+    --btn-text-color: hsl(240, 35%, 21%);
+    --top-btn-color: hsl(208, 51%, 65%);
+    --top-btn-text-color: hsl(240, 35%, 21%);
+    --cell-color: lightsteelblue;
+    --title-color: lightsteelblue;
+    --title-shadow-color: hsl(240, 33%, 34%);
 }
 
 h1 {
-    color: var(--free-text-color);
+    color: var(--title-color);
     text-align: center;
+    text-shadow: 2px 1px var(--title-shadow-color);
 }
 
 h3 {
@@ -71,7 +76,6 @@ table {
 
 .board-container {
     margin: auto;
-    /* border: 3px solid yellow; */
     width: 200px;
     z-index: 1;
 }
@@ -101,14 +105,13 @@ table {
 }
 
 .cell.active:hover {
-    background-color: var(--btn-text-color);
+    background-color: aliceblue;
     cursor: pointer;
 }
 
 .modal-container {
     margin: auto;
     align-items: center;
-    /* border: 3px solid yellow; */
     width: 220px;
 }
 
@@ -128,7 +131,6 @@ table {
 }
 
 .timer-container {
-    /* border: 3px solid red; */
     align-items: center;
     margin: auto;
     width: 110px;
@@ -152,17 +154,15 @@ table {
 
 .top-info-container {
     margin: auto;
-    /* border: 3px solid red; */
-    width: 270px;
+    width: 280px;
     align-items: center;
     gap: 10px;
+    /* border: 3px solid yellow; */
 }
 
 .top-info {
     display: inline-block;
     padding: 15px;
-    /* background-color: aliceblue; */
-    /* border: 3px solid aliceblue; */
     border-radius: 10%;
     background-color: var(--top-btn-color);
     height: 50px;
@@ -176,7 +176,6 @@ table {
 
 .top-info-container-two {
     margin: auto;
-    /* border: 3px solid yellow; */
     align-items: center;
     width: 300px;
     height: 100px;
@@ -184,11 +183,19 @@ table {
 
 .night-mode-btn {
     cursor: pointer;
+    background-color: var(--btn-color);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    text-align: center;
+    padding:10px;
+    margin-top: 20px;
+    margin-left:20px;
+
 }
 
 .hints-container {
     position: absolute;
-    /* border: 3px solid red; */
     display: inline-block;
     height: 50px;
     margin: 20px auto;
@@ -211,7 +218,7 @@ table {
 }
 
 .hint-clicked {
-    /* box-shadow: 0 0 50px 15px #e0c257; */
+    box-shadow: 0 0 50px 15px #e0c257;
     transition: 0.5s;
 
 }
@@ -238,7 +245,7 @@ p {
 .safe-click-btn {
 
     border: 2px solid var(--btn-color);
-    color:var(--free-text-color);
+    color: var(--top-btn-text-color);
     background-color: var(--top-btn-color);
     border-radius: 10%;
     margin: auto;
@@ -260,7 +267,6 @@ p {
 .hint-mode-cell:hover {
     box-shadow: 0 0 10px 5px #e0c257;
 }
-
 
 .safe-cell {
     border: 2px solid lightgreen;
@@ -310,7 +316,7 @@ p {
 
 .manual-mode-container {
     /* border: 3px solid yellow; */
-    width: 250px;
+    width: 270px;
     margin: auto;
     padding: 10px;
 }
@@ -330,4 +336,20 @@ p {
 
 .manual-mode-cell-clicked {
     border: 2px solid lightsalmon;
+}
+
+.undo-btn {
+    height: 45px;
+    cursor: pointer;
+}
+
+.undo-btn:hover {
+    background-color: var(--btn-color);
+    color: var(--btn-text-color);
+    transition: 0.5s;
+}
+
+.smiley:hover {
+   background-color: var(--btn-color);
+   transition: 0.5s;
 }

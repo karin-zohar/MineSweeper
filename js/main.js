@@ -1,5 +1,4 @@
 'use strict'
-console.log('hello!')
 
 const EMPTY = '?'
 const MINE = '💣'
@@ -47,7 +46,9 @@ function resetGame() {
         isHintMode: false,
         safeClicksLeft: 3,
         isManualMode: false,
-        isNightMode: false
+        isNightMode: false,
+        isMegaHintMode: false,
+        history: []
     }
 }
 
@@ -103,7 +104,6 @@ function createCellData(i, j) {
 
 function hideStartGameBtn() {
     var elStartGameBtn = document.querySelector('.start-game')
-    console.log('elStartGameBtn: ', elStartGameBtn)
     elStartGameBtn.classList.add('hide')
 }
 
@@ -154,7 +154,7 @@ function onLevelBtn(levelBtn) {
 }
 
 function onCellClicked(elCell) {
-    var cellLocation = { i: elCell.dataset.i, j: elCell.dataset.j }
+    var cellLocation = { i: +elCell.dataset.i, j: +elCell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
     if (cellData.isMarked || cellData.isShown) {
         return
@@ -200,6 +200,7 @@ function onCellClicked(elCell) {
 
 
 function expandShown(cellNegs) {
+    if (gGame.isHintMode) { return }
     for (var i = 0; i < cellNegs.length; i++) {
         const cell = cellNegs[i]
         if (cell.minesAroundCount === 0 && !cell.isMine) {
@@ -248,7 +249,6 @@ function onMarkCell(cell) {
     if (cellData.isShown) {
         return
     }
-    // cellData.isMarked = (cellData.isMarked) ? false : true
     if (cellData.isMarked) {
         cellData.isMarked = false
         gGame.markedCount--
@@ -262,12 +262,13 @@ function onMarkCell(cell) {
 }
 
 function startGame(cellLocation) {
-        gGame.isOn = true
-        gGame.isStarted = true
-        handleElements()
-        startTimer()
-        addMines(cellLocation)
-        setMinesNegsCount(gBoard)
+    gGame.isOn = true
+    gGame.isStarted = true
+    handleElements()
+    startTimer()
+    storeGameHistory({target:null})
+    addMines(cellLocation)
+    setMinesNegsCount(gBoard)
 }
 
 function checkGameOver(isMarked) {
@@ -282,18 +283,19 @@ function checkGameOver(isMarked) {
             }
         }
         // user marked all the mines - win
-        //console.log('case 2')
+        console.log('case 2')
         gameOver(true)
     } else {
         //user ran out of lives - lose
         if (gGame.lives === 0) {
-            //console.log('case 1')
+            console.log('case 1')
             gameOver(false)
             return
         }
         // user revealed the entire board, lives > 0  - win
         if (gGame.showCount + gGame.markedCount === gLevel.size ** 2) {
-            //console.log('case 3')
+            console.log('gGame.showCount: ', gGame.showCount)
+            console.log('case 3')
             gameOver(true)
 
         }
@@ -304,6 +306,7 @@ function checkGameOver(isMarked) {
 function gameOver(isVictory) {
     gGame.isOn = false
     gGame.isVictory = isVictory
+    showAllCells()
     handleModal()
     handleSmiley()
     handleElements()
@@ -431,10 +434,14 @@ function renderLeaderBoard(mat, selector) {
     <table border="0"><tbody>`
     strHTML += `<tr><td class="leaderboard-cell heading">Place</td><td class="leaderboard-cell heading">nickname</td><td class="leaderboard-cell heading">score</td></tr>`
     for (var i = 0; i < mat.length; i++) {
+        console.log('entered outer for loop')
+        console.log('mat[0]: ', mat[0])
 
         strHTML += '<tr>'
         for (var j = 0; j < mat[0].length; j++) {
+            console.log('entered inner for loop')
             const cell = mat[i][j]
+            console.log('cell: ', cell)
             const className = `leaderboard-cell cell-${i}-${j}`
 
             strHTML += `<td class="${className}" =>${cell}</td>`
@@ -488,6 +495,8 @@ function onManualModeBtn(elManualModeBtn) {
 
 function onManualModeDoneBtn(elManualModeDoneBtn) {
     gGame.isManualMode = !gGame.isManualMode
+    //preventing addMines() from adding mines where the user didn't place them
+    gLevel.mines = 0
 
     elManualModeDoneBtn.classList.add('hide')
     const elCells = document.querySelectorAll('.cell')
@@ -501,7 +510,7 @@ function onManualModeDoneBtn(elManualModeDoneBtn) {
     elManualModeBtn.classList.add('hide')
 }
 
-function ManuallyAddMine(elCell,cellData) {
+function ManuallyAddMine(elCell, cellData) {
     elCell.classList.add('manual-mode-cell-clicked')
     cellData.isMine = true
 }
@@ -514,3 +523,35 @@ function onNightMode(elNightModeBtn) {
     elNightModeBtn.innerHTML = nightModeIcon
 
 }
+
+function showAllCells() {
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard.length; j++) {
+            const cell = gBoard[i][j]
+            cell.isShown = true
+        }
+    }
+}
+
+
+function storeGameHistory(ev) {
+    if (!gGame.isOn) return
+    const elUndoBtn = document.querySelector('.undo-btn')
+    if (ev.target === elUndoBtn)  return
+    var currBoard = JSON.parse(JSON.stringify(gBoard))
+    var currLives = gGame.lives
+    var currState = { board: currBoard, lives: currLives }
+    gGame.history.push(currState)
+}
+
+function onUndoBtn() {
+    gGame.history.pop()
+    const lastState = gGame.history[gGame.history.length - 1]
+    gBoard = JSON.parse(JSON.stringify(lastState.board))
+    gGame.lives = lastState.lives
+    updateLives(0)
+    gDisplayBoard = buildDisplayBoard()
+    renderBoard(gDisplayBoard, '.board-container')
+}
+
+
