@@ -48,6 +48,7 @@ function resetGame() {
         isManualMode: false,
         isNightMode: false,
         isMegaHintMode: false,
+        megaHintAreaLimits: [],
         history: []
     }
 }
@@ -74,7 +75,7 @@ function buildDisplayBoard() {
         displayBoard[i] = []
         for (var j = 0; j < gLevel.size; j++) {
             var cellData = gBoard[i][j]
-
+            
             if (cellData.isShown) {
                 displayBoard[i][j] = (cellData.isMine) ? MINE : cellData.minesAroundCount
             } else if (cellData.isMarked) {
@@ -87,6 +88,11 @@ function buildDisplayBoard() {
     return displayBoard
 }
 
+function updateBoard() {
+    gDisplayBoard = buildDisplayBoard()
+    renderBoard(gDisplayBoard, '.board-container')
+}
+
 function createCellData(i, j) {
     var cellData = {
         location: {
@@ -97,16 +103,9 @@ function createCellData(i, j) {
         isShown: false,
         isMine: false,
         isMarked: false,
-        isWall: false
     }
     return cellData
 }
-
-function hideStartGameBtn() {
-    var elStartGameBtn = document.querySelector('.start-game')
-    elStartGameBtn.classList.add('hide')
-}
-
 
 function startTimer() {
     var startTime = Date.now()
@@ -154,6 +153,7 @@ function onLevelBtn(levelBtn) {
 }
 
 function onCellClicked(elCell) {
+    if (gGame.isMegaHintMode) return
     var cellLocation = { i: +elCell.dataset.i, j: +elCell.dataset.j }
     var cellData = gBoard[cellLocation.i][cellLocation.j]
     if (cellData.isMarked || cellData.isShown) {
@@ -176,8 +176,7 @@ function onCellClicked(elCell) {
     cellData.isShown = true
     if (gGame.isHintMode) {
         cellData.isShown = true
-        gDisplayBoard = buildDisplayBoard()
-        renderBoard(gDisplayBoard, '.board-container')
+        updateBoard()
         setTimeout(() => {
             cellData.isShown = false
             gGame.showCount--
@@ -192,8 +191,7 @@ function onCellClicked(elCell) {
         expandShown(cellNegs)
     }
 
-    gDisplayBoard = buildDisplayBoard()
-    renderBoard(gDisplayBoard, '.board-container')
+    updateBoard()
     checkGameOver(false)
 }
 
@@ -266,7 +264,7 @@ function startGame(cellLocation) {
     gGame.isStarted = true
     handleElements()
     startTimer()
-    storeGameHistory({target:null})
+    storeGameHistory({ target: null })
     addMines(cellLocation)
     setMinesNegsCount(gBoard)
 }
@@ -283,18 +281,17 @@ function checkGameOver(isMarked) {
             }
         }
         // user marked all the mines - win
-        console.log('case 2')
+        console.log('case 1')
         gameOver(true)
     } else {
         //user ran out of lives - lose
         if (gGame.lives === 0) {
-            console.log('case 1')
+            console.log('case 2')
             gameOver(false)
             return
         }
         // user revealed the entire board, lives > 0  - win
         if (gGame.showCount + gGame.markedCount === gLevel.size ** 2) {
-            console.log('gGame.showCount: ', gGame.showCount)
             console.log('case 3')
             gameOver(true)
 
@@ -531,13 +528,14 @@ function showAllCells() {
             cell.isShown = true
         }
     }
+    updateBoard()
 }
 
 
 function storeGameHistory(ev) {
     if (!gGame.isOn) return
     const elUndoBtn = document.querySelector('.undo-btn')
-    if (ev.target === elUndoBtn)  return
+    if (ev.target === elUndoBtn) return
     var currBoard = JSON.parse(JSON.stringify(gBoard))
     var currLives = gGame.lives
     var currState = { board: currBoard, lives: currLives }
@@ -550,8 +548,58 @@ function onUndoBtn() {
     gBoard = JSON.parse(JSON.stringify(lastState.board))
     gGame.lives = lastState.lives
     updateLives(0)
-    gDisplayBoard = buildDisplayBoard()
-    renderBoard(gDisplayBoard, '.board-container')
+    updateBoard()
 }
 
 
+function onMegaHintBtn() {
+    gGame.isMegaHintMode = true
+}
+
+function getMegaHintArea(elCell) {
+    if (!gGame.isMegaHintMode) return
+    var cellLocation = { cellI: +elCell.dataset.i, cellJ: +elCell.dataset.j }
+    if (!gGame.isOn) startGame(cellLocation)
+    const corners = gGame.megaHintAreaLimits
+    corners.push(cellLocation)
+    if (corners.length === 2) showMegaHintArea(corners)
+}
+
+
+function showMegaHintArea(corners) {
+    const cornerA = corners[0]
+    const cornerB = corners[1]
+    const areaCells = []
+    for (var i = cornerA.cellI; i <= cornerB.cellI; i++) {
+        for (var j = cornerA.cellJ; j <= cornerB.cellJ; j++) {
+            gBoard[i][j].isShown = true
+            areaCells.push(gBoard[i][j])
+            updateBoard()
+        }
+        setTimeout(() => {
+            for (var i = 0; i < areaCells.length; i++) {
+                areaCells[i].isShown = false
+            }
+            updateBoard()
+        }, 2000);
+    }
+    gGame.isMegaHintMode = false
+    const elMegaHintContainer = document.querySelector('.mega-hint-container')
+    elMegaHintContainer.classList.add('hide')
+}
+
+
+function onExterminatorBtn() {
+    const elExterminatorBtn = document.querySelector('.exterminator-btn')
+    elExterminatorBtn.classList.add('hide')
+
+    for (var i = 0; i < 3; i++) {
+        if (gGame.mineLocations.length > 0) {
+            const currMineLocation = gGame.mineLocations.pop()
+            const cellData = gBoard[currMineLocation.i][currMineLocation.j]
+            cellData.isMine = false
+        } else return
+    }
+    setMinesNegsCount(gBoard)
+    updateBoard()
+}
