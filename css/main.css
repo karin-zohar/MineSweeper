@@ -45,7 +45,6 @@ table {
 .level-btns-container {
     margin: auto;
     align-items: center;
-    /* border: 3px solid yellow; */
     width: 360px;
 }
 
@@ -157,7 +156,6 @@ table {
     width: 280px;
     align-items: center;
     gap: 10px;
-    /* border: 3px solid yellow; */
 }
 
 .top-info {
@@ -194,20 +192,16 @@ table {
     justify-content: center;
     width: 470px;
     height: 100px;
-    /* border: 3px solid yellow; */
     gap: 15px;
 }
 
 
 .mega-hint-container {
-    /* margin: -100px 10px; */
     display: flex;
     height: 100px;
     width: 70px;
     left: 50%;
-    /* border: 3px solid green; */
     align-items: center;
-    /* position: absolute; */
 
 }
 
@@ -215,13 +209,11 @@ table {
    padding: 25px;
    margin: auto;
    line-height: 78%;
-   /* position: absolute; */
    display: inline-block;
    
 }
 
 .exterminator-btn {
-    /* position: absolute; */
     margin: auto;
     padding: 25px;
     line-height: 78%;
@@ -230,8 +222,6 @@ table {
 }
 
 .hints-container {
-    /* border: 3px solid red; */
-    /* position: absolute; */
     display: inline-block;
     height: 40px;
     margin: 20px;
@@ -262,9 +252,7 @@ table {
 .safe-click {
     display: inline-block;
     padding: 5px;
-    /* margin: auto; */
     box-sizing: border-box;
-    /* border: 3px solid red; */
     width: 100px;
     height: 60px;
     border-radius: 10%;
@@ -316,7 +304,6 @@ p {
 }
 
 .leaderboard-cell {
-    /* background-color: whitesmoke; */
     color: var(--free-text-color);
     height: 20px;
     width: 25px;
@@ -351,7 +338,6 @@ p {
 }
 
 .manual-mode-container {
-    /* border: 3px solid yellow; */
     width: 280px;
     margin: auto;
     padding: 10px;

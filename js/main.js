@@ -164,7 +164,7 @@ function onCellClicked(elCell) {
         ManuallyAddMine(elCell, cellData)
         return
     }
-    if (!gGame.isOn) startGame(cellLocation)
+    if (!gGame.isOn || gDisplayBoard[0][0] === undefined) startGame(cellLocation)
 
     gGame.showCount++
 
@@ -260,13 +260,15 @@ function onMarkCell(cell) {
 }
 
 function startGame(cellLocation) {
+    resetGame()
     gGame.isOn = true
     gGame.isStarted = true
     handleElements()
-    startTimer()
+    if (gGame.secsPassed === 0) startTimer()
     storeGameHistory({ target: null })
     addMines(cellLocation)
     setMinesNegsCount(gBoard)
+    resetSafeClickBtn()
 }
 
 function checkGameOver(isMarked) {
@@ -281,18 +283,15 @@ function checkGameOver(isMarked) {
             }
         }
         // user marked all the mines - win
-        console.log('case 1')
         gameOver(true)
     } else {
         //user ran out of lives - lose
         if (gGame.lives === 0) {
-            console.log('case 2')
             gameOver(false)
             return
         }
         // user revealed the entire board, lives > 0  - win
         if (gGame.showCount + gGame.markedCount === gLevel.size ** 2) {
-            console.log('case 3')
             gameOver(true)
 
         }
@@ -318,9 +317,6 @@ function gameOver(isVictory) {
         displayLeaderBoard()
     }
 }
-
-
-
 
 function updateLives(diff) {
     gGame.lives -= diff
@@ -355,6 +351,8 @@ function handleElements() {
     const elModalContainer = document.querySelector('.modal-container')
     const elTimerContainer = document.querySelector('.timer-container')
     const elManualModeBtn = document.querySelector('.manual-mode-btn')
+    const elExterminatorBtn = document.querySelector('.exterminator-btn')
+    const elMegaHintContainer = document.querySelector('.mega-hint-container')
 
     handleSmiley()
 
@@ -364,6 +362,8 @@ function handleElements() {
         elTimerContainer.classList.remove('hide')
         elTopInfoContainerTwo.classList.remove('hide')
         elManualModeBtn.classList.add('hide')
+        elExterminatorBtn.classList.remove('hide')
+        elMegaHintContainer.classList.remove('hide')
     } else if (gGame.showCount === 0 && gGame.markedCount === 0) {
         elLevelBtnsContainer.classList.remove('hide')
         elModalContainer.classList.add('hide')
@@ -475,6 +475,12 @@ function onSafeClick() {
     const onSafeClickBtn = document.querySelector('.safe-click-btn')
     onSafeClickBtn.innerHTML = gGame.safeClicksLeft
 }
+
+function resetSafeClickBtn() {
+    const onSafeClickBtn = document.querySelector('.safe-click-btn')
+    onSafeClickBtn.innerHTML = gGame.safeClicksLeft
+}
+
 
 function onManualModeBtn(elManualModeBtn) {
     elManualModeBtn.classList.toggle('manual-mode-on')
